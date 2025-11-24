@@ -46,7 +46,10 @@ jobs:
 
       - name: Install iOS simulator runtime
         run: |
-          sudo xcodebuild -downloadPlatform iOS || echo "Simulator runtime already installed"
+          for platform in iOS iOS_Simulator; do
+            echo "Downloading $platform platform if missing..."
+            sudo xcodebuild -downloadPlatform "$platform" || echo "$platform already available"
+          done
 
       - name: Install .NET MAUI
         run: dotnet workload install maui
