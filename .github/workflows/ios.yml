@@ -55,16 +55,32 @@ jobs:
           p12-password: ${{ env.P12_PASSWORD }}
 
       - name: List all provisioning profiles
+        env:
+          PRIVATE_KEY: ${{ env.APPSTORE_PRIVATE_KEY }}
         run: |
-          echo "Listing all provisioning profiles for bundle ID: ${{ env.BUNDLE_ID }}"
-          curl -s -X GET \
-            -H "Authorization: Bearer $(ruby -e "require 'jwt'; puts JWT.encode({iss: '${{ env.APPSTORE_ISSUER_ID }}', exp: Time.now.to_i + 1200, aud: 'appstoreconnect-v1'}, '${{ env.APPSTORE_PRIVATE_KEY }}', 'ES256', {kid: '${{ env.APPSTORE_KEY_ID }}'})" \
-            "https://api.appstoreconnect.apple.com/v1/profiles?filter[profileType]=IOS_APP_ADHOC" | jq '.'
-          
-          echo ""
-          echo "All profiles (any type):"
-          curl -s -X GET \
-            -H "Authorization: Bearer $(ruby -e "require 'jwt'; puts JWT.encode({iss: '${{ env.APPSTORE_ISSUER_ID }}', exp: Time.now.to_i + 1200, aud: 'appstoreconnect-v1'}, '${{ env.APPSTORE_PRIVATE_KEY }}', 'ES256', {kid: '${{ env.APPSTORE_KEY_ID }}'})" \
+          echo "Listing provisioning profiles via App Store Connect API"
+
+          JWT=$(ruby <<'RUBY'
+          require 'jwt'
+          payload = {
+            iss: ENV['APPSTORE_ISSUER_ID'],
+            exp: Time.now.to_i + 1200,
+            aud: 'appstoreconnect-v1'
+          }
+          header = { kid: ENV['APPSTORE_KEY_ID'] }
+          token = JWT.encode(payload, ENV['PRIVATE_KEY'], 'ES256', header)
+          puts token
+          RUBY
+          )
+
+          echo "\nAd Hoc profiles:"
+          curl -s \
+            -H "Authorization: Bearer $JWT" \
+            "https://api.appstoreconnect.apple.com/v1/profiles?filter[profileType]=IOS_APP_ADHOC" | jq '.data[] | {name: .attributes.name, profileType: .attributes.profileType, profileState: .attributes.profileState}'
+
+          echo "\nAll profiles:"
+          curl -s \
+            -H "Authorization: Bearer $JWT" \
             "https://api.appstoreconnect.apple.com/v1/profiles" | jq '.data[] | {name: .attributes.name, profileType: .attributes.profileType, profileState: .attributes.profileState}'
 
       - name: Download provisioning profile (Ad Hoc)
