@@ -44,6 +44,11 @@ jobs:
         with:
           xcode-version: 26.1
 
+      - name: Install iOS simulator runtime
+        run: |
+          sudo xcodebuild -runFirstLaunch || true
+          sudo xcodebuild -downloadPlatform iOS
+
       - name: Install .NET MAUI
         run: dotnet workload install maui
 
