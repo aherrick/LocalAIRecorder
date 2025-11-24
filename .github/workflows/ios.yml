@@ -65,7 +65,7 @@ jobs:
       - name: Update app version
         uses: managedcode/MAUIAppVersion@v1
         with:
-          csproj: "./LocalAIRecorder/LocalAIRecorder.csproj"
+          csproj: "./LocalAIRecorder.csproj"
           version: ${{ env.VERSION }}
           displayVersion: ${{ env.VERSION }}
           printFile: false
