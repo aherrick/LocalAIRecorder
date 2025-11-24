@@ -1,6 +1,6 @@
 # LocalAIRecorder
 
-![Build Status](https://github.com/YOUR_USERNAME/YOUR_REPO_NAME/actions/workflows/build.yml/badge.svg)
+![Build Status](https://github.com/aherrick/LocalAIRecorder/actions/workflows/build.yml/badge.svg)
 
 LocalAIRecorder is a cross-platform .NET MAUI application that allows you to record audio, transcribe it locally using Whisper, and chat with your recordings using on-device Large Language Models (LLMs).
 
