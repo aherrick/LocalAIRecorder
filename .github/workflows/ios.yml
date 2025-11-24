@@ -72,7 +72,7 @@ jobs:
 
       - name: Build iOS IPA (Ad Hoc)
         run: |
-          dotnet publish ./LocalAIRecorder/LocalAIRecorder.csproj \
+          dotnet publish ./LocalAIRecorder.csproj \
             -f net10.0-ios \
             -c Release \
             -p:RuntimeIdentifier=ios-arm64 \
