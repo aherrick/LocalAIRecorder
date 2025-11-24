@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-ios:
+  ios:
     runs-on: macos-15
 
     env:
