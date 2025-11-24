@@ -51,6 +51,10 @@ jobs:
             sudo xcodebuild -downloadPlatform "$platform" || echo "$platform already available"
           done
 
+      - name: List installed simulator runtimes
+        run: |
+          xcrun simctl list runtimes
+
       - name: Install .NET MAUI
         run: dotnet workload install maui
 
