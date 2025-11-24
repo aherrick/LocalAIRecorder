@@ -9,7 +9,7 @@ jobs:
 
     env:
       APP_NAME: LocalAIRecorder
-      BUNDLE_ID: com.ajh.LocalAIRecorder
+      BUNDLE_ID: com.ajh.localairecorder
       IPA_NAME: LocalAIRecorder.ipa
       IPA_PATH: publishapp/LocalAIRecorder.ipa
 
