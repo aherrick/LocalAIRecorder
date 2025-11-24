@@ -1,0 +1,181 @@
+name: ios
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    runs-on: macos-15
+
+    env:
+      APP_NAME: LocalAIRecorder
+      BUNDLE_ID: com.ajh.LocalAIRecorder
+      IPA_NAME: LocalAIRecorder.ipa
+      IPA_PATH: publishapp/LocalAIRecorder.ipa
+
+      # UPDATED STATIC URL (no trailing slash)
+      STATIC_URL: "https://localairecorder.z19.web.core.windows.net"
+
+      APPLE_TEAM_ID: 55P33KNTP3
+      CODESIGN_KEY: "Apple Distribution: Andrew Herrick (55P33KNTP3)"
+      CODESIGN_PROVISION: "LocalAIRecorder"
+      VERSION: 1.0.${{ github.run_number }}
+
+      # Secrets (pulled up)
+      P12_FILE_BASE64: ${{ secrets.CERTIFICATES_P12_BASE64FILE }}
+      P12_PASSWORD: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
+      APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+      APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+      APPSTORE_PRIVATE_KEY: ${{ secrets.APPSTORE_PRIVATE_KEY }}
+      AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
+      AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "10.0.x"
+          dotnet-quality: preview
+
+      - name: Set Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: 26.0.1
+
+      - name: Install .NET MAUI
+        run: dotnet workload install maui
+
+      - name: Import Apple signing certs
+        uses: apple-actions/import-codesign-certs@v1
+        with:
+          p12-file-base64: ${{ env.P12_FILE_BASE64 }}
+          p12-password: ${{ env.P12_PASSWORD }}
+
+      - name: Download provisioning profile (Ad Hoc)
+        uses: apple-actions/download-provisioning-profiles@v1
+        with:
+          bundle-id: ${{ env.BUNDLE_ID }}
+          profile-type: IOS_APP_ADHOC
+          issuer-id: ${{ env.APPSTORE_ISSUER_ID }}
+          api-key-id: ${{ env.APPSTORE_KEY_ID }}
+          api-private-key: ${{ env.APPSTORE_PRIVATE_KEY }}
+
+      - name: Update app version
+        uses: managedcode/MAUIAppVersion@v1
+        with:
+          csproj: "./LocalAIRecorder/LocalAIRecorder.csproj"
+          version: ${{ env.VERSION }}
+          displayVersion: ${{ env.VERSION }}
+          printFile: false
+
+      - name: Build iOS IPA (Ad Hoc)
+        run: |
+          dotnet publish ./LocalAIRecorder/LocalAIRecorder.csproj \
+            -f net10.0-ios \
+            -c Release \
+            -p:RuntimeIdentifier=ios-arm64 \
+            -p:ArchiveOnBuild=true \
+            -p:PackageApp=true \
+            -p:BuildIpa=true \
+            -p:BundleIdentifier="${{ env.BUNDLE_ID }}" \
+            -p:CodesignTeamId="${{ env.APPLE_TEAM_ID }}" \
+            -p:CodesignKey="${{ env.CODESIGN_KEY }}" \
+            -p:CodesignProvision="${{ env.CODESIGN_PROVISION }}" \
+            -o publishapp
+
+      - name: Generate manifest.plist & index.html
+        id: ota
+        run: |
+          mkdir -p output
+
+          VERSION="${VERSION}"
+          IPA_URL="${STATIC_URL}/ios/${IPA_NAME}"
+          PLIST_URL="${STATIC_URL}/ios/manifest.plist"
+
+          # manifest.plist
+          cat <<EOF > output/manifest.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>items</key>
+              <array>
+                  <dict>
+                      <key>assets</key>
+                      <array>
+                          <dict>
+                              <key>kind</key>
+                              <string>software-package</string>
+                              <key>url</key>
+                              <string>${IPA_URL}</string>
+                          </dict>
+                      </array>
+                      <key>metadata</key>
+                      <dict>
+                          <key>bundle-identifier</key>
+                          <string>${BUNDLE_ID}</string>
+                          <key>bundle-version</key>
+                          <string>${VERSION}</string>
+                          <key>kind</key>
+                          <string>software</string>
+                          <key>title</key>
+                          <string>${APP_NAME}</string>
+                      </dict>
+                  </dict>
+              </array>
+          </dict>
+          </plist>
+          EOF
+
+          # index.html
+          ENCODED_PLIST_URL=$(python3 -c "import urllib.parse; print(urllib.parse.quote('${PLIST_URL}', safe=''))")
+          INSTALL_URL="itms-services://?action=download-manifest&url=${ENCODED_PLIST_URL}"
+
+          cat <<EOF > output/index.html
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Install ${APP_NAME}</title>
+              <style>
+                  body { font-family: -apple-system, sans-serif; text-align: center; padding-top: 50px; }
+                  .btn { background: #007aff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 10px; font-size: 18px; }
+              </style>
+          </head>
+          <body>
+              <h1>${APP_NAME} v${VERSION}</h1>
+              <p><a href="${INSTALL_URL}" class="btn">Install App</a></p>
+          </body>
+          </html>
+          EOF
+
+          echo "plist_url=${PLIST_URL}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload IPA, manifest, and HTML to Azure
+        uses: azure/CLI@v2
+        with:
+          inlineScript: |
+            upload_blob() {
+              az storage blob upload \
+                --account-name "$AZURE_STORAGE_ACCOUNT" \
+                --account-key "$AZURE_STORAGE_KEY" \
+                --container-name '$web' \
+                --name "$1" \
+                --file "$2" \
+                --overwrite \
+                --content-type "$3"
+            }
+
+            upload_blob "ios/${IPA_NAME}" "${IPA_PATH}" "application/octet-stream"
+            upload_blob "ios/manifest.plist" "output/manifest.plist" "application/xml"
+            upload_blob "ios/index.html" "output/index.html" "text/html"
+
+      - name: Output install URLs
+        run: |
+          echo "🍺 ${APP_NAME} deployed!"
+          echo "Landing page: ${STATIC_URL}/ios/index.html"
+          echo "IPA:          ${STATIC_URL}/ios/${IPA_NAME}"
+          echo "Manifest:     ${STATIC_URL}/ios/manifest.plist"
