@@ -79,6 +79,7 @@ jobs:
             -p:ArchiveOnBuild=true \
             -p:PackageApp=true \
             -p:BuildIpa=true \
+            -p:UseDeviceOnlyBuild=true \
             -p:BundleIdentifier="${{ env.BUNDLE_ID }}" \
             -p:CodesignTeamId="${{ env.APPLE_TEAM_ID }}" \
             -p:CodesignKey="${{ env.CODESIGN_KEY }}" \
