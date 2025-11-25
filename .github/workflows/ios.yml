@@ -185,6 +185,6 @@ jobs:
       - name: Output install URLs
         run: |
           echo "🍺 ${APP_NAME} deployed!"
-          echo "Landing page: ${STATIC_URL}/ios/index.html"
+          echo "Landing page: ${STATIC_URL}/index.html"
           echo "IPA:          ${STATIC_URL}/ios/${IPA_NAME}"
           echo "Manifest:     ${STATIC_URL}/ios/manifest.plist"
