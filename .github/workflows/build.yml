@@ -19,4 +19,4 @@ jobs:
       run: dotnet workload install maui
       
     - name: Build
-      run: dotnet build LocalAIRecorder.sln
+      run: dotnet build LocalAIRecorder.csproj
