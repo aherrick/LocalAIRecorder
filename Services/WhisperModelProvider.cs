@@ -14,9 +14,9 @@ public static class WhisperModelProvider
         {
             Directory.CreateDirectory(FileSystem.AppDataDirectory);
 
-            using var modelStream = await WhisperGgmlDownloader
-                .Default
-                .GetGgmlModelAsync(GgmlType.Base);
+            using var modelStream = await WhisperGgmlDownloader.Default.GetGgmlModelAsync(
+                GgmlType.Base
+            );
 
             using var fileWriter = File.OpenWrite(modelPath);
             await modelStream.CopyToAsync(fileWriter);

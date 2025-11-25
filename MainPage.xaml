@@ -6,18 +6,18 @@
 
     <Grid RowDefinitions="Auto,*,Auto" Padding="20" RowSpacing="20">
         <VerticalStackLayout Grid.Row="0" Spacing="10">
-            <Label Text="Recordings" FontSize="Subtitle" FontAttributes="Bold"/>
-            <Button x:Name="DownloadModelsButton" 
-                    Text="Download AI Models" 
+            <Label Text="Recordings" FontSize="Subtitle" FontAttributes="Bold" />
+            <Button x:Name="DownloadModelsButton"
+                    Text="Download AI Models"
                     Clicked="OnDownloadModelsClicked"
-                    IsVisible="False"/>
-            <Label x:Name="StatusLabel" Text="Ready" TextColor="Gray"/>
-            <ProgressBar x:Name="DownloadProgress" IsVisible="False"/>
+                    IsVisible="False" />
+            <Label x:Name="StatusLabel" Text="Ready" TextColor="Gray" />
+            <ProgressBar x:Name="DownloadProgress" IsVisible="False" />
         </VerticalStackLayout>
 
         <CollectionView Grid.Row="1" x:Name="RecordingsCollectionView" SelectionMode="Single" SelectionChanged="OnRecordingSelected">
             <CollectionView.ItemTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="x:String">
                     <Frame Padding="10" Margin="0,5">
                         <Label Text="{Binding .}" />
                     </Frame>
@@ -26,16 +26,16 @@
         </CollectionView>
 
         <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="10">
-            <Button 
+            <Button
                 Grid.Column="0"
-                x:Name="RecordButton" 
-                Text="Start Recording" 
+                x:Name="RecordButton"
+                Text="Start Recording"
                 Clicked="OnRecordClicked"
                 HeightRequest="60"
                 CornerRadius="30"
                 BackgroundColor="Red"
                 TextColor="White"
-                FontAttributes="Bold"/>
+                FontAttributes="Bold" />
 
             <ActivityIndicator
                 Grid.Column="1"
@@ -46,5 +46,4 @@
                 HorizontalOptions="End" />
         </Grid>
     </Grid>
-
 </ContentPage>

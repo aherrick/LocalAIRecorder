@@ -1,5 +1,5 @@
-﻿using LocalAIRecorder.Services;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using LocalAIRecorder.Services;
 
 namespace LocalAIRecorder;
 
@@ -77,7 +77,11 @@ public partial class MainPage : ContentPage
 #endif
                 if (status != PermissionStatus.Granted)
                 {
-                    await DisplayAlertAsync("Permission", "Microphone permission is required.", "OK");
+                    await DisplayAlertAsync(
+                        "Permission",
+                        "Microphone permission is required.",
+                        "OK"
+                    );
                     return;
                 }
 
@@ -102,12 +106,9 @@ public partial class MainPage : ContentPage
         if (e.CurrentSelection.Count > 0 && e.CurrentSelection[0] is string filePath)
         {
             // Navigate to DetailsPage
-            var navigationParameter = new Dictionary<string, object>
-            {
-                { "FilePath", filePath }
-            };
+            var navigationParameter = new Dictionary<string, object> { { "FilePath", filePath } };
             await Shell.Current.GoToAsync(nameof(DetailsPage), navigationParameter);
-            
+
             // Deselect
             RecordingsCollectionView.SelectedItem = null;
         }

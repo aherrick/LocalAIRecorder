@@ -6,9 +6,9 @@ namespace LocalAIRecorder.Services;
 public class WhisperService : IAsyncDisposable
 {
     private readonly SemaphoreSlim _initLock = new(1, 1);
-    private WhisperFactory? _factory;
+    private WhisperFactory _factory;
     private bool _initialized;
-    private string? _modelPath;
+    private string _modelPath;
 
     public async Task InitializeAsync()
     {

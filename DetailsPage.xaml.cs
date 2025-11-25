@@ -1,5 +1,5 @@
-using LocalAIRecorder.Services;
 using System.Collections.ObjectModel;
+using LocalAIRecorder.Services;
 
 namespace LocalAIRecorder;
 
@@ -7,7 +7,7 @@ public partial class DetailsPage : ContentPage, IQueryAttributable
 {
     private readonly WhisperService _whisperService;
     private readonly ILocalIntelligenceService _localIntelligence;
-    private string? _audioFilePath;
+    private string _audioFilePath;
 
     public ObservableCollection<ChatMessage> ChatMessages { get; set; } = new();
 
@@ -17,9 +17,8 @@ public partial class DetailsPage : ContentPage, IQueryAttributable
         _whisperService = whisperService;
         _localIntelligence = localIntelligence;
         ChatCollectionView.ItemsSource = ChatMessages;
-        
+
         // Simple converter for demo (should be in resources)
-        Resources.Add("BoolToColorConverter", new BoolToColorConverter());
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -32,7 +31,8 @@ public partial class DetailsPage : ContentPage, IQueryAttributable
 
     private async void OnTranscribeClicked(object sender, EventArgs e)
     {
-        if (string.IsNullOrEmpty(_audioFilePath)) return;
+        if (string.IsNullOrEmpty(_audioFilePath))
+            return;
 
         LoadingIndicator.IsVisible = true;
         LoadingIndicator.IsRunning = true;
@@ -58,12 +58,18 @@ public partial class DetailsPage : ContentPage, IQueryAttributable
     private async void OnSendClicked(object sender, EventArgs e)
     {
         var text = ChatInput.Text;
-        if (string.IsNullOrWhiteSpace(text)) return;
+        if (string.IsNullOrWhiteSpace(text))
+            return;
 
         ChatMessages.Add(new ChatMessage { Text = text, IsUser = true });
         ChatInput.Text = "";
 
-        var responseMessage = new ChatMessage { Text = "", IsUser = false, IsThinking = true };
+        var responseMessage = new ChatMessage
+        {
+            Text = "",
+            IsUser = false,
+            IsThinking = true,
+        };
         ChatMessages.Add(responseMessage);
 
         // Include transcript in context if it's the first message or manage context
@@ -82,34 +88,48 @@ public partial class DetailsPage : ContentPage, IQueryAttributable
 public class ChatMessage : System.ComponentModel.INotifyPropertyChanged
 {
     private string _text = string.Empty;
-    public string Text 
-    { 
-        get => _text; 
-        set 
-        { 
-            _text = value; 
-            PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(Text))); 
-        } 
+
+    public string Text
+    {
+        get => _text;
+        set
+        {
+            _text = value;
+            PropertyChanged?.Invoke(
+                this,
+                new System.ComponentModel.PropertyChangedEventArgs(nameof(Text))
+            );
+        }
     }
+
     public bool IsUser { get; set; }
 
     private bool _isThinking;
+
     public bool IsThinking
     {
         get => _isThinking;
         set
         {
             _isThinking = value;
-            PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(IsThinking)));
+            PropertyChanged?.Invoke(
+                this,
+                new System.ComponentModel.PropertyChangedEventArgs(nameof(IsThinking))
+            );
         }
     }
 
-    public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
+    public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 }
 
 public class BoolToColorConverter : IValueConverter
 {
-    public object? Convert(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture)
+    public object Convert(
+        object value,
+        Type targetType,
+        object parameter,
+        System.Globalization.CultureInfo culture
+    )
     {
         if (value is bool b)
         {
@@ -118,7 +138,12 @@ public class BoolToColorConverter : IValueConverter
         return Colors.LightGray;
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture)
+    public object ConvertBack(
+        object value,
+        Type targetType,
+        object parameter,
+        System.Globalization.CultureInfo culture
+    )
     {
         throw new NotImplementedException();
     }

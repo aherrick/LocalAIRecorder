@@ -5,15 +5,15 @@ namespace LocalAIRecorder.Services;
 
 public class AudioService
 {
-    private IAudioStreamer? _streamer;
-    private MemoryStream? _pcmBuffer;
-    private string? _targetPath;
+    private IAudioStreamer _streamer;
+    private MemoryStream _pcmBuffer;
+    private string _targetPath;
 
     public AudioService()
     {
     }
 
-    public bool IsRecording => _streamer?.IsStreaming ?? false;
+    public bool IsRecording => _streamer != null && _streamer.IsStreaming;
 
     public async Task StartRecordingAsync()
     {
@@ -57,7 +57,7 @@ public class AudioService
         return result;
     }
 
-    private void OnAudioCaptured(object? sender, AudioStreamEventArgs e)
+    private void OnAudioCaptured(object sender, AudioStreamEventArgs e)
     {
         if (_pcmBuffer == null)
             return;
