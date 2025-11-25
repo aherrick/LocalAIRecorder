@@ -27,7 +27,7 @@ jobs:
       APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
       APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
       APPSTORE_PRIVATE_KEY: ${{ secrets.APPSTORE_PRIVATE_KEY }}
-      AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
+      AZURE_STORAGE_ACCOUNT: localairecorder
       AZURE_STORAGE_KEY: ${{ secrets.AZURE_STORAGE_KEY }}
 
     steps:
