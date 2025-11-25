@@ -16,19 +16,19 @@ public partial class DetailsViewModel(
     private Recording _currentRecording;
 
     [ObservableProperty]
-    private string transcript = string.Empty;
+    public partial string Transcript { get; set; }
 
     [ObservableProperty]
-    private bool isTranscribing;
+    public partial bool IsTranscribing { get; set; }
 
     [ObservableProperty]
-    private string chatInput = string.Empty;
+    public partial string ChatInput { get; set; }
 
     [ObservableProperty]
-    private bool isThinking;
+    public partial bool IsThinking { get; set; }
 
     [ObservableProperty]
-    private ObservableCollection<ChatMessage> chatMessages = [];
+    public partial ObservableCollection<ChatMessage> ChatMessages { get; set; } = [];
 
     public async void ApplyQueryAttributes(IDictionary<string, object> query)
     {
@@ -90,7 +90,7 @@ public partial class DetailsViewModel(
         }
         catch (Exception ex)
         {
-            await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
+            await Shell.Current.DisplayAlertAsync("Error", ex.Message, "OK");
         }
         finally
         {

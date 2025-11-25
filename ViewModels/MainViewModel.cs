@@ -13,22 +13,22 @@ public partial class MainViewModel(
 ) : ObservableObject
 {
     [ObservableProperty]
-    private ObservableCollection<Recording> recordings = new();
+    public partial ObservableCollection<Recording> Recordings { get; set; } = [];
 
     [ObservableProperty]
-    private bool isRecording;
+    public partial bool IsRecording { get; set; }
 
     [ObservableProperty]
-    private bool isBusy;
+    public partial bool IsBusy { get; set; }
 
     [ObservableProperty]
-    private string statusText = "Ready";
+    public partial string StatusText { get; set; } = "Ready";
 
     [ObservableProperty]
-    private string recordButtonText = "Start Recording";
+    public partial string RecordButtonText { get; set; } = "Start Recording";
 
     [ObservableProperty]
-    private Color recordButtonColor = Colors.Red;
+    public partial Color RecordButtonColor { get; set; } = Colors.Red;
 
     public async Task InitializeAsync()
     {
