@@ -6,11 +6,12 @@ using LocalAIRecorder.Services;
 
 namespace LocalAIRecorder.ViewModels;
 
-public partial class DetailsViewModel : ObservableObject, IQueryAttributable
+public partial class DetailsViewModel(
+    WhisperService whisperService,
+    ILocalIntelligenceService localIntelligence,
+    DatabaseService databaseService
+) : ObservableObject, IQueryAttributable
 {
-    private readonly WhisperService _whisperService;
-    private readonly ILocalIntelligenceService _localIntelligence;
-    private readonly DatabaseService _databaseService;
     private int _recordingId;
     private Recording _currentRecording;
 
@@ -27,27 +28,23 @@ public partial class DetailsViewModel : ObservableObject, IQueryAttributable
     private bool isThinking;
 
     [ObservableProperty]
-    private ObservableCollection<ChatMessage> chatMessages = new();
-
-    public DetailsViewModel(WhisperService whisperService, ILocalIntelligenceService localIntelligence, DatabaseService databaseService)
-    {
-        _whisperService = whisperService;
-        _localIntelligence = localIntelligence;
-        _databaseService = databaseService;
-    }
+    private ObservableCollection<ChatMessage> chatMessages = [];
 
     public async void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-        if (query.ContainsKey("RecordingId"))
+        if (
+            query.TryGetValue("RecordingId", out var recordingIdObj)
+            && recordingIdObj is int recordingId
+        )
         {
-            _recordingId = (int)query["RecordingId"];
+            _recordingId = recordingId;
             await LoadRecordingAsync();
         }
     }
 
     private async Task LoadRecordingAsync()
     {
-        _currentRecording = await _databaseService.GetRecordingAsync(_recordingId);
+        _currentRecording = await databaseService.GetRecordingAsync(_recordingId);
         if (_currentRecording == null)
             return;
 
@@ -63,7 +60,7 @@ public partial class DetailsViewModel : ObservableObject, IQueryAttributable
         }
 
         // Load chat history
-        var messages = await _databaseService.GetChatMessagesAsync(_recordingId);
+        var messages = await databaseService.GetChatMessagesAsync(_recordingId);
         ChatMessages.Clear();
         foreach (var msg in messages)
         {
@@ -81,16 +78,19 @@ public partial class DetailsViewModel : ObservableObject, IQueryAttributable
 
         try
         {
-            var transcript = await _whisperService.TranscribeWavFileAsync(_currentRecording.FilePath, "en");
+            var transcript = await whisperService.TranscribeWavFileAsync(
+                _currentRecording.FilePath,
+                "en"
+            );
             Transcript = transcript;
 
             // Save transcript to database
             _currentRecording.Transcript = transcript;
-            await _databaseService.SaveRecordingAsync(_currentRecording);
+            await databaseService.SaveRecordingAsync(_currentRecording);
         }
         catch (Exception ex)
         {
-            await Application.Current.MainPage.DisplayAlert("Error", ex.Message, "OK");
+            await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
         }
         finally
         {
@@ -113,9 +113,9 @@ public partial class DetailsViewModel : ObservableObject, IQueryAttributable
             RecordingId = _recordingId,
             Text = text,
             IsUser = true,
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTime.Now,
         };
-        await _databaseService.SaveChatMessageAsync(userMessage);
+        await databaseService.SaveChatMessageAsync(userMessage);
         ChatMessages.Add(userMessage);
 
         // Show thinking indicator
@@ -129,7 +129,7 @@ public partial class DetailsViewModel : ObservableObject, IQueryAttributable
         }
 
         // Get AI response
-        var answer = await _localIntelligence.AskAsync(prompt);
+        var answer = await localIntelligence.AskAsync(prompt);
 
         // Hide thinking indicator
         IsThinking = false;
@@ -140,9 +140,9 @@ public partial class DetailsViewModel : ObservableObject, IQueryAttributable
             RecordingId = _recordingId,
             Text = answer,
             IsUser = false,
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTime.Now,
         };
-        await _databaseService.SaveChatMessageAsync(responseMessage);
+        await databaseService.SaveChatMessageAsync(responseMessage);
         ChatMessages.Add(responseMessage);
     }
 }

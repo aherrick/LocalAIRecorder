@@ -6,12 +6,12 @@ using LocalAIRecorder.Services;
 
 namespace LocalAIRecorder.ViewModels;
 
-public partial class MainViewModel : ObservableObject
+public partial class MainViewModel(
+    AudioService audioService,
+    DatabaseService databaseService,
+    WhisperService whisperService
+) : ObservableObject
 {
-    private readonly AudioService _audioService;
-    private readonly DatabaseService _databaseService;
-    private readonly WhisperService _whisperService;
-
     [ObservableProperty]
     private ObservableCollection<Recording> recordings = new();
 
@@ -30,13 +30,6 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private Color recordButtonColor = Colors.Red;
 
-    public MainViewModel(AudioService audioService, DatabaseService databaseService, WhisperService whisperService)
-    {
-        _audioService = audioService;
-        _databaseService = databaseService;
-        _whisperService = whisperService;
-    }
-
     public async Task InitializeAsync()
     {
         await LoadRecordingsAsync();
@@ -46,7 +39,7 @@ public partial class MainViewModel : ObservableObject
     private async Task LoadRecordingsAsync()
     {
         Recordings.Clear();
-        var recordings = await _databaseService.GetRecordingsAsync();
+        var recordings = await databaseService.GetRecordingsAsync();
         foreach (var recording in recordings)
         {
             Recordings.Add(recording);
@@ -80,7 +73,7 @@ public partial class MainViewModel : ObservableObject
         }
 
         IsBusy = true;
-        await _audioService.StartRecordingAsync();
+        await audioService.StartRecordingAsync();
         IsRecording = true;
         RecordButtonText = "Stop Recording";
         RecordButtonColor = Colors.DarkRed;
@@ -92,7 +85,7 @@ public partial class MainViewModel : ObservableObject
     {
         IsBusy = true;
 
-        var (filePath, duration) = await _audioService.StopRecordingAsync();
+        var (filePath, duration) = await audioService.StopRecordingAsync();
         IsRecording = false;
         RecordButtonText = "Start Recording";
         RecordButtonColor = Colors.Red;
@@ -105,15 +98,18 @@ public partial class MainViewModel : ObservableObject
                 FilePath = filePath,
                 CreatedAt = DateTime.Now,
                 Transcript = string.Empty,
-                DurationSeconds = duration
+                DurationSeconds = duration,
             };
-            await _databaseService.SaveRecordingAsync(recording);
+            await databaseService.SaveRecordingAsync(recording);
             Recordings.Insert(0, recording);
 
             StatusText = "Recording saved.";
 
             // Navigate to DetailsPage
-            var navigationParameter = new Dictionary<string, object> { { "RecordingId", recording.Id } };
+            var navigationParameter = new Dictionary<string, object>
+            {
+                { "RecordingId", recording.Id },
+            };
             await Shell.Current.GoToAsync(nameof(DetailsPage), navigationParameter);
         }
         else
@@ -130,7 +126,10 @@ public partial class MainViewModel : ObservableObject
         if (recording == null)
             return;
 
-        var navigationParameter = new Dictionary<string, object> { { "RecordingId", recording.Id } };
+        var navigationParameter = new Dictionary<string, object>
+        {
+            { "RecordingId", recording.Id },
+        };
         await Shell.Current.GoToAsync(nameof(DetailsPage), navigationParameter);
     }
 
@@ -142,7 +141,7 @@ public partial class MainViewModel : ObservableObject
 
         try
         {
-            await _whisperService.EnsureModelAsync();
+            await whisperService.EnsureModelAsync();
             StatusText = "Whisper model ready.";
         }
         catch (Exception ex)
