@@ -1,0 +1,34 @@
+name: scan
+
+on:
+  push:
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install Roslynator CLI
+        run: dotnet tool install --global roslynator.dotnet.cli
+
+      - name: Fetch Roslynator analyzers
+        run: |
+          curl -L https://www.nuget.org/api/v2/package/Roslynator.Analyzers -o Roslynator.Analyzers.zip
+          unzip -q Roslynator.Analyzers.zip -d analyzers/Roslynator.Analyzers
+
+      - name: Analyze
+        run: roslynator analyze LocalAIRecorder.slnx --analyzer-assemblies "analyzers/Roslynator.Analyzers/analyzers" --ignore-compiler-diagnostics
+        
+      - name: Find unused private code
+        continue-on-error: true
+        run: >
+          roslynator find-symbol LocalAIRecorder.slnx
+          --symbol-kind type-or-member
+          --unused
+          --visibility private
+          --without-attribute System.ObsoleteAttribute

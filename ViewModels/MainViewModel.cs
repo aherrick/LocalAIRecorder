@@ -139,7 +139,7 @@ public partial class MainViewModel(
         if (recording == null)
             return;
 
-        bool confirm = await Shell.Current.DisplayAlert(
+        bool confirm = await Shell.Current.DisplayAlertAsync(
             "Delete",
             $"Delete {recording.Filename}?",
             "Yes",
