@@ -1,7 +1,4 @@
 using Whisper.net;
-using Whisper.net.Ggml;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace LocalAIRecorder.Services;
 
@@ -20,19 +17,17 @@ public class TranscriptionService
         }
 
         using var whisperFactory = WhisperFactory.FromPath(modelPath);
-        using var processor = whisperFactory.CreateBuilder()
-            .WithLanguage("auto")
-            .Build();
+        using var processor = whisperFactory.CreateBuilder().WithLanguage("auto").Build();
 
         using var fileStream = File.OpenRead(audioFilePath);
-        
+
         // Whisper.net expects a WAV file with specific format (16kHz, 16-bit, mono)
         // The fileStream here is just the raw bytes of the file.
-        // If the file is a valid WAV, Whisper.net can process it directly if we don't use WaveFileReader wrapper 
+        // If the file is a valid WAV, Whisper.net can process it directly if we don't use WaveFileReader wrapper
         // BUT using WaveFileReader is safer if we want to ensure we are reading audio data correctly.
         // However, the provided snippet uses ProcessAsync(fileStream) directly which assumes raw PCM or WAV handling.
         // Let's stick to the simple approach first, but if it fails we might need to strip WAV headers.
-        
+
         var transcript = "";
         await foreach (var result in processor.ProcessAsync(fileStream))
         {

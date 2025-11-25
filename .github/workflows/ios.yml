@@ -160,23 +160,26 @@ jobs:
           echo "plist_url=${PLIST_URL}" >> "$GITHUB_OUTPUT"
 
       - name: Upload IPA, manifest, and HTML to Azure
-        uses: azure/CLI@v2
-        with:
-          inlineScript: |
-            upload_blob() {
-              az storage blob upload \
-                --account-name "$AZURE_STORAGE_ACCOUNT" \
-                --account-key "$AZURE_STORAGE_KEY" \
-                --container-name '$web' \
-                --name "$1" \
-                --file "$2" \
-                --overwrite \
-                --content-type "$3"
-            }
+        run: |
+          upload_blob() {
+            az storage blob upload \
+              --account-name "$AZURE_STORAGE_ACCOUNT" \
+              --account-key "$AZURE_STORAGE_KEY" \
+              --container-name '$web' \
+              --name "$1" \
+              --file "$2" \
+              --overwrite \
+              --content-type "$3"
+          }
 
-            upload_blob "ios/${IPA_NAME}" "${IPA_PATH}" "application/octet-stream"
-            upload_blob "ios/manifest.plist" "output/manifest.plist" "application/xml"
-            upload_blob "ios/index.html" "output/index.html" "text/html"
+          upload_blob "ios/${IPA_NAME}" "${IPA_PATH}" "application/octet-stream"
+          upload_blob "ios/manifest.plist" "output/manifest.plist" "application/xml"
+          upload_blob "ios/index.html" "output/index.html" "text/html"
+        env:
+          AZURE_STORAGE_ACCOUNT: ${{ env.AZURE_STORAGE_ACCOUNT }}
+          AZURE_STORAGE_KEY: ${{ env.AZURE_STORAGE_KEY }}
+          IPA_NAME: ${{ env.IPA_NAME }}
+          IPA_PATH: ${{ env.IPA_PATH }}
 
       - name: Output install URLs
         run: |

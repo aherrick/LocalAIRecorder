@@ -1,6 +1,5 @@
 ﻿using LocalAIRecorder.Services;
 using Microsoft.Extensions.Logging;
-using Plugin.Maui.Audio;
 
 namespace LocalAIRecorder;
 
