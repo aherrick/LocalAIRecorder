@@ -1,4 +1,5 @@
 ﻿using LocalAIRecorder.Services;
+using LocalAIRecorder.ViewModels;
 using Microsoft.Extensions.Logging;
 
 namespace LocalAIRecorder;
@@ -21,6 +22,7 @@ public static class MauiProgram
 #endif
 
         // Services
+        builder.Services.AddSingleton<DatabaseService>();
         builder.Services.AddSingleton<AudioService>();
         builder.Services.AddSingleton<WhisperService>();
 
@@ -29,6 +31,10 @@ public static class MauiProgram
 #elif WINDOWS
         builder.Services.AddSingleton<ILocalIntelligenceService, WindowsLocalIntelligenceService>();
 #endif
+
+        // ViewModels
+        builder.Services.AddTransient<MainViewModel>();
+        builder.Services.AddTransient<DetailsViewModel>();
 
         // Pages
         builder.Services.AddTransient<MainPage>();

@@ -8,6 +8,7 @@ public class AudioService
     private IAudioStreamer _streamer;
     private MemoryStream _pcmBuffer;
     private string _targetPath;
+    private DateTime _recordingStartTime;
 
     public AudioService()
     {
@@ -26,16 +27,20 @@ public class AudioService
         _streamer.Options.SampleRate = 16000;
 
         _pcmBuffer = new MemoryStream();
-        _targetPath = Path.Combine(FileSystem.CacheDirectory, "recording.wav");
+        
+        // Generate unique timestamped filename and save to AppDataDirectory for persistence
+        var fileName = $"recording_{DateTime.Now:yyyyMMdd_HHmmss}.wav";
+        _targetPath = Path.Combine(FileSystem.AppDataDirectory, fileName);
 
         _streamer.OnAudioCaptured += OnAudioCaptured;
+        _recordingStartTime = DateTime.Now;
         await _streamer.StartAsync();
     }
 
-    public async Task<string> StopRecordingAsync()
+    public async Task<(string filePath, double durationSeconds)> StopRecordingAsync()
     {
         if (_streamer == null || _pcmBuffer == null || _targetPath == null)
-            return string.Empty;
+            return (string.Empty, 0);
 
         await _streamer.StopAsync();
         _streamer.OnAudioCaptured -= OnAudioCaptured;
@@ -53,8 +58,9 @@ public class AudioService
         await fileStream.WriteAsync(pcmData);
 
         var result = _targetPath;
+        var duration = (DateTime.Now - _recordingStartTime).TotalSeconds;
         _targetPath = null;
-        return result;
+        return (result, duration);
     }
 
     private void OnAudioCaptured(object sender, AudioStreamEventArgs e)

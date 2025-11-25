@@ -2,48 +2,62 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:LocalAIRecorder"
+             xmlns:vm="clr-namespace:LocalAIRecorder.ViewModels"
+             xmlns:models="clr-namespace:LocalAIRecorder.Models"
              x:Class="LocalAIRecorder.DetailsPage"
+             x:DataType="vm:DetailsViewModel"
              Title="Recording Details">
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <local:BoolToColorConverter x:Key="BoolToColorConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
-    <Grid RowDefinitions="Auto,*,Auto" Padding="10">
-        <VerticalStackLayout Grid.Row="0" Spacing="10">
-            <Label Text="Transcript" FontSize="Subtitle" FontAttributes="Bold" />
-            <Editor x:Name="TranscriptEditor"
+	<ContentPage.Resources>
+		<ResourceDictionary>
+			<local:BoolToColorConverter x:Key="BoolToColorConverter" />
+		</ResourceDictionary>
+	</ContentPage.Resources>
+	<Grid RowDefinitions="Auto,*,Auto" Padding="10">
+		<VerticalStackLayout Grid.Row="0" Spacing="10">
+			<Label Text="Transcript" FontSize="Subtitle" FontAttributes="Bold"/>
+			<Editor Text="{Binding Transcript}" 
                     Placeholder="Transcript will appear here..."
                     HeightRequest="150"
-                    IsReadOnly="True" />
-            <Button x:Name="TranscribeButton"
-                    Text="Transcribe"
-                    Clicked="OnTranscribeClicked" />
-        </VerticalStackLayout>
+                    IsReadOnly="True"/>
+		</VerticalStackLayout>
 
-        <CollectionView Grid.Row="1" x:Name="ChatCollectionView" Margin="0,10,0,0">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="local:ChatMessage">
-                    <Frame Padding="10" Margin="5" BackgroundColor="{Binding IsUser, Converter={StaticResource BoolToColorConverter}}">
-                        <Grid>
+        <Grid Grid.Row="1" Margin="0,10,0,0">
+            <CollectionView ItemsSource="{Binding ChatMessages}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:ChatMessage">
+                        <Frame Padding="10" Margin="5" BackgroundColor="{Binding IsUser, Converter={StaticResource BoolToColorConverter}}">
                             <Label Text="{Binding Text}" TextColor="Black" />
-                            <ActivityIndicator IsRunning="{Binding IsThinking}"
-                                             IsVisible="{Binding IsThinking}"
-                                             Color="Black"
-                                             HeightRequest="20"
-                                             WidthRequest="20"
-                                             HorizontalOptions="Center" />
-                        </Grid>
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-
-        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="5">
-            <Entry x:Name="ChatInput" Placeholder="Ask about the recording..." />
-            <Button Text="Send" Grid.Column="1" Clicked="OnSendClicked" />
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            
+            <Frame Padding="10" 
+                   Margin="5" 
+                   BackgroundColor="LightGray"
+                   IsVisible="{Binding IsThinking}"
+                   VerticalOptions="End">
+                <ActivityIndicator IsRunning="{Binding IsThinking}"
+                                 Color="Black"
+                                 HeightRequest="20"
+                                 WidthRequest="20"
+                                 HorizontalOptions="Center" />
+            </Frame>
         </Grid>
 
-        <ActivityIndicator x:Name="LoadingIndicator" IsRunning="False" IsVisible="False" Grid.RowSpan="3" HorizontalOptions="Center" VerticalOptions="Center" />
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="5">
+            <Entry Text="{Binding ChatInput}" 
+                   Placeholder="Ask about the recording..."
+                   ReturnCommand="{Binding SendMessageCommand}" />
+            <Button Text="Send" 
+                    Grid.Column="1" 
+                    Command="{Binding SendMessageCommand}" />
+        </Grid>
+
+        <ActivityIndicator IsRunning="{Binding IsTranscribing}" 
+                          IsVisible="{Binding IsTranscribing}" 
+                          Grid.RowSpan="3" 
+                          HorizontalOptions="Center" 
+                          VerticalOptions="Center" />
     </Grid>
 </ContentPage>

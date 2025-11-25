@@ -1,25 +1,38 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:LocalAIRecorder.Models"
+             xmlns:vm="clr-namespace:LocalAIRecorder.ViewModels"
              x:Class="LocalAIRecorder.MainPage"
+             x:DataType="vm:MainViewModel"
              Title="Local AI Recorder">
 
     <Grid RowDefinitions="Auto,*,Auto" Padding="20" RowSpacing="20">
         <VerticalStackLayout Grid.Row="0" Spacing="10">
             <Label Text="Recordings" FontSize="Subtitle" FontAttributes="Bold" />
-            <Button x:Name="DownloadModelsButton"
-                    Text="Download AI Models"
-                    Clicked="OnDownloadModelsClicked"
+            <Button Text="Download AI Models"
+                    Command="{Binding DownloadModelsCommand}"
                     IsVisible="False" />
-            <Label x:Name="StatusLabel" Text="Ready" TextColor="Gray" />
-            <ProgressBar x:Name="DownloadProgress" IsVisible="False" />
+            <Label Text="{Binding StatusText}" TextColor="Gray" />
         </VerticalStackLayout>
 
-        <CollectionView Grid.Row="1" x:Name="RecordingsCollectionView" SelectionMode="Single" SelectionChanged="OnRecordingSelected">
+        <CollectionView Grid.Row="1" 
+                        ItemsSource="{Binding Recordings}" 
+                        SelectionMode="Single"
+                        SelectionChangedCommand="{Binding SelectRecordingCommand}"
+                        SelectionChangedCommandParameter="{Binding Source={RelativeSource Self}, Path=SelectedItem}">
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="x:String">
+                <DataTemplate x:DataType="local:Recording">
                     <Frame Padding="10" Margin="0,5">
-                        <Label Text="{Binding .}" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Filename}" FontAttributes="Bold"/>
+                                <Grid ColumnDefinitions="Auto,Auto">
+                                    <Label Text="{Binding CreatedAt, StringFormat='{0:g}'}" FontSize="12" TextColor="Gray"/>
+                                    <Label Text="{Binding DurationSeconds, StringFormat=' • {0:F1}s'}" Grid.Column="1" FontSize="12" TextColor="Gray"/>
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Grid>
                     </Frame>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
@@ -28,20 +41,18 @@
         <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="10">
             <Button
                 Grid.Column="0"
-                x:Name="RecordButton"
-                Text="Start Recording"
-                Clicked="OnRecordClicked"
+                Text="{Binding RecordButtonText}"
+                Command="{Binding ToggleRecordingCommand}"
                 HeightRequest="60"
                 CornerRadius="30"
-                BackgroundColor="Red"
+                BackgroundColor="{Binding RecordButtonColor}"
                 TextColor="White"
                 FontAttributes="Bold" />
 
             <ActivityIndicator
                 Grid.Column="1"
-                x:Name="RecordingIndicator"
-                IsVisible="False"
-                IsRunning="False"
+                IsVisible="{Binding IsBusy}"
+                IsRunning="{Binding IsBusy}"
                 VerticalOptions="Center"
                 HorizontalOptions="End" />
         </Grid>
