@@ -16,8 +16,8 @@
             <Label Text="{Binding StatusText}" TextColor="Gray" />
         </VerticalStackLayout>
 
-        <CollectionView Grid.Row="1" 
-                        ItemsSource="{Binding Recordings}" 
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Recordings}"
                         SelectionMode="Single"
                         SelectionChangedCommand="{Binding SelectRecordingCommand}"
                         SelectionChangedCommandParameter="{Binding Source={RelativeSource Self}, Path=SelectedItem}">
@@ -35,10 +35,10 @@
                         <Frame Padding="10" Margin="0,5">
                             <Grid ColumnDefinitions="*,Auto">
                                 <VerticalStackLayout>
-                                    <Label Text="{Binding Filename}" FontAttributes="Bold"/>
+                                    <Label Text="{Binding Filename}" FontAttributes="Bold" />
                                     <Grid ColumnDefinitions="Auto,Auto">
-                                        <Label Text="{Binding CreatedAt, StringFormat='{0:g}'}" FontSize="12" TextColor="Gray"/>
-                                        <Label Text="{Binding DurationSeconds, StringFormat=' • {0:F1}s'}" Grid.Column="1" FontSize="12" TextColor="Gray"/>
+                                        <Label Text="{Binding CreatedAt, StringFormat='{0:g}'}" FontSize="12" TextColor="Gray" />
+                                        <Label Text="{Binding DurationSeconds, StringFormat=' • {0:F1}s'}" Grid.Column="1" FontSize="12" TextColor="Gray" />
                                     </Grid>
                                 </VerticalStackLayout>
                             </Grid>

@@ -136,10 +136,17 @@ public partial class MainViewModel(
     [RelayCommand]
     private async Task DeleteRecordingAsync(Recording recording)
     {
-        if (recording == null) return;
+        if (recording == null)
+            return;
 
-        bool confirm = await Shell.Current.DisplayAlert("Delete", $"Delete {recording.Filename}?", "Yes", "No");
-        if (!confirm) return;
+        bool confirm = await Shell.Current.DisplayAlert(
+            "Delete",
+            $"Delete {recording.Filename}?",
+            "Yes",
+            "No"
+        );
+        if (!confirm)
+            return;
 
         await databaseService.DeleteRecordingAsync(recording);
         Recordings.Remove(recording);

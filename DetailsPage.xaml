@@ -7,19 +7,19 @@
              x:Class="LocalAIRecorder.DetailsPage"
              x:DataType="vm:DetailsViewModel"
              Title="Recording Details">
-	<ContentPage.Resources>
-		<ResourceDictionary>
-			<local:BoolToColorConverter x:Key="BoolToColorConverter" />
-		</ResourceDictionary>
-	</ContentPage.Resources>
-	<Grid RowDefinitions="Auto,*,Auto" Padding="10">
-		<VerticalStackLayout Grid.Row="0" Spacing="10">
-			<Label Text="Transcript" FontSize="Subtitle" FontAttributes="Bold"/>
-			<Editor Text="{Binding Transcript}" 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <local:BoolToColorConverter x:Key="BoolToColorConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <Grid RowDefinitions="Auto,*,Auto" Padding="10">
+        <VerticalStackLayout Grid.Row="0" Spacing="10">
+            <Label Text="Transcript" FontSize="Subtitle" FontAttributes="Bold" />
+            <Editor Text="{Binding Transcript}"
                     Placeholder="Transcript will appear here..."
                     HeightRequest="150"
-                    IsReadOnly="True"/>
-		</VerticalStackLayout>
+                    IsReadOnly="True" />
+        </VerticalStackLayout>
 
         <Grid Grid.Row="1" Margin="0,10,0,0">
             <CollectionView ItemsSource="{Binding ChatMessages}">
@@ -31,9 +31,9 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-            
-            <Frame Padding="10" 
-                   Margin="5" 
+
+            <Frame Padding="10"
+                   Margin="5"
                    BackgroundColor="LightGray"
                    IsVisible="{Binding IsThinking}"
                    VerticalOptions="End">
@@ -46,18 +46,18 @@
         </Grid>
 
         <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="5">
-            <Entry Text="{Binding ChatInput}" 
+            <Entry Text="{Binding ChatInput}"
                    Placeholder="Ask about the recording..."
                    ReturnCommand="{Binding SendMessageCommand}" />
-            <Button Text="Send" 
-                    Grid.Column="1" 
+            <Button Text="Send"
+                    Grid.Column="1"
                     Command="{Binding SendMessageCommand}" />
         </Grid>
 
-        <ActivityIndicator IsRunning="{Binding IsTranscribing}" 
-                          IsVisible="{Binding IsTranscribing}" 
-                          Grid.RowSpan="3" 
-                          HorizontalOptions="Center" 
+        <ActivityIndicator IsRunning="{Binding IsTranscribing}"
+                          IsVisible="{Binding IsTranscribing}"
+                          Grid.RowSpan="3"
+                          HorizontalOptions="Center"
                           VerticalOptions="Center" />
     </Grid>
 </ContentPage>

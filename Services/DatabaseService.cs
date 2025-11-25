@@ -1,5 +1,5 @@
-using SQLite;
 using LocalAIRecorder.Models;
+using SQLite;
 
 namespace LocalAIRecorder.Services;
 
@@ -22,17 +22,13 @@ public class DatabaseService
     public async Task<List<Recording>> GetRecordingsAsync()
     {
         await InitAsync();
-        return await _database.Table<Recording>()
-            .OrderByDescending(r => r.CreatedAt)
-            .ToListAsync();
+        return await _database.Table<Recording>().OrderByDescending(r => r.CreatedAt).ToListAsync();
     }
 
     public async Task<Recording> GetRecordingAsync(int id)
     {
         await InitAsync();
-        return await _database.Table<Recording>()
-            .Where(r => r.Id == id)
-            .FirstOrDefaultAsync();
+        return await _database.Table<Recording>().Where(r => r.Id == id).FirstOrDefaultAsync();
     }
 
     public async Task<int> SaveRecordingAsync(Recording recording)
@@ -47,23 +43,25 @@ public class DatabaseService
     public async Task<int> DeleteRecordingAsync(Recording recording)
     {
         await InitAsync();
-        
+
         // Delete associated chat messages
-        await _database.Table<ChatMessage>()
+        await _database
+            .Table<ChatMessage>()
             .Where(c => c.RecordingId == recording.Id)
             .DeleteAsync();
-        
+
         // Delete the audio file
         if (File.Exists(recording.FilePath))
             File.Delete(recording.FilePath);
-        
+
         return await _database.DeleteAsync(recording);
     }
 
     public async Task<List<ChatMessage>> GetChatMessagesAsync(int recordingId)
     {
         await InitAsync();
-        return await _database.Table<ChatMessage>()
+        return await _database
+            .Table<ChatMessage>()
             .Where(c => c.RecordingId == recordingId)
             .OrderBy(c => c.CreatedAt)
             .ToListAsync();
@@ -72,7 +70,7 @@ public class DatabaseService
     public async Task<int> SaveChatMessageAsync(ChatMessage message)
     {
         await InitAsync();
-        
+
         if (message.Id != 0)
             return await _database.UpdateAsync(message);
         else

@@ -11,8 +11,7 @@ public class AudioService
     private DateTime _recordingStartTime;
 
     public AudioService()
-    {
-    }
+    { }
 
     public bool IsRecording => _streamer != null && _streamer.IsStreaming;
 
@@ -27,7 +26,7 @@ public class AudioService
         _streamer.Options.SampleRate = 16000;
 
         _pcmBuffer = new MemoryStream();
-        
+
         // Generate unique timestamped filename and save to AppDataDirectory for persistence
         var fileName = $"recording_{DateTime.Now:yyyyMMdd_HHmmss}.wav";
         _targetPath = Path.Combine(FileSystem.AppDataDirectory, fileName);

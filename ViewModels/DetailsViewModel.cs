@@ -6,6 +6,8 @@ using LocalAIRecorder.Services;
 
 namespace LocalAIRecorder.ViewModels;
 
+// ViewModel for the details page. MAUI Shell passes navigation query parameters
+// via IQueryAttributable.ApplyQueryAttributes; we use RecordingId to load data.
 public partial class DetailsViewModel(
     WhisperService whisperService,
     ILocalIntelligenceService localIntelligence,

@@ -16,7 +16,9 @@ public class WhisperService
         {
             Directory.CreateDirectory(FileSystem.AppDataDirectory);
 
-            using var modelStream = await WhisperGgmlDownloader.Default.GetGgmlModelAsync(GgmlType.Base);
+            using var modelStream = await WhisperGgmlDownloader.Default.GetGgmlModelAsync(
+                GgmlType.Base
+            );
             using var fileWriter = File.OpenWrite(modelPath);
             await modelStream.CopyToAsync(fileWriter);
         }
@@ -25,7 +27,7 @@ public class WhisperService
     public async Task<string> TranscribeWavFileAsync(string wavPath, string language = "en")
     {
         var modelPath = Path.Combine(FileSystem.AppDataDirectory, ModelFileName);
-        
+
         if (!File.Exists(modelPath))
             await EnsureModelAsync();
 
