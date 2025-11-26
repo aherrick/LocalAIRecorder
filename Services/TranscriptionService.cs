@@ -2,7 +2,7 @@ using Whisper.net;
 
 namespace LocalAIRecorder.Services;
 
-public class TranscriptionService
+public static class TranscriptionService
 {
     public static async Task<string> TranscribeAsync(string audioFilePath, string modelPath)
     {
@@ -16,10 +16,10 @@ public class TranscriptionService
             throw new FileNotFoundException("Audio file not found", audioFilePath);
         }
 
-        using var whisperFactory = WhisperFactory.FromPath(modelPath);
-        using var processor = whisperFactory.CreateBuilder().WithLanguage("auto").Build();
+        await using var whisperFactory = WhisperFactory.FromPath(modelPath);
+        await using var processor = whisperFactory.CreateBuilder().WithLanguage("auto").Build();
 
-        using var fileStream = File.OpenRead(audioFilePath);
+        await using var fileStream = File.OpenRead(audioFilePath);
 
         // Whisper.net expects a WAV file with specific format (16kHz, 16-bit, mono)
         // The fileStream here is just the raw bytes of the file.

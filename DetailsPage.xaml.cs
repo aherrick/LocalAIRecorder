@@ -15,9 +15,9 @@ public class BoolToColorConverter : IValueConverter
 {
     public object Convert(
         object value,
-        Type targetType,
-        object parameter,
-        System.Globalization.CultureInfo culture
+        Type _,
+        object __,
+        System.Globalization.CultureInfo ___
     )
     {
         if (value is bool b)
@@ -29,9 +29,9 @@ public class BoolToColorConverter : IValueConverter
 
     public object ConvertBack(
         object value,
-        Type targetType,
-        object parameter,
-        System.Globalization.CultureInfo culture
+        Type _,
+        object __,
+        System.Globalization.CultureInfo ___
     )
     {
         throw new NotImplementedException();

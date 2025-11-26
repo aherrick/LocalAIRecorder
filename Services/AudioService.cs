@@ -13,7 +13,7 @@ public class AudioService
     public AudioService()
     { }
 
-    public bool IsRecording => _streamer != null && _streamer.IsStreaming;
+    public bool IsRecording => _streamer?.IsStreaming ?? false;
 
     public async Task StartRecordingAsync()
     {
@@ -62,7 +62,7 @@ public class AudioService
         return (result, duration);
     }
 
-    private void OnAudioCaptured(object sender, AudioStreamEventArgs e)
+    private void OnAudioCaptured(object? _, AudioStreamEventArgs e)
     {
         if (_pcmBuffer == null)
             return;

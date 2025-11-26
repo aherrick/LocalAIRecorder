@@ -31,8 +31,8 @@ public class WhisperService
         if (!File.Exists(modelPath))
             await EnsureModelAsync();
 
-        using var factory = WhisperFactory.FromPath(modelPath);
-        using var processor = factory
+        await using var factory = WhisperFactory.FromPath(modelPath);
+        await using var processor = factory
             .CreateBuilder()
             .WithLanguage(language)
             .WithThreads(Environment.ProcessorCount)
