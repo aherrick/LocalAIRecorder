@@ -13,7 +13,9 @@ public class AudioService
     public AudioService()
     { }
 
+#pragma warning disable RCS1146 // Conditional access would require nullable
     public bool IsRecording => _streamer != null && _streamer.IsStreaming;
+#pragma warning restore RCS1146
 
     public async Task StartRecordingAsync()
     {
@@ -62,7 +64,9 @@ public class AudioService
         return (result, duration);
     }
 
+#pragma warning disable RCS1163 // Event handler signature requires sender
     private void OnAudioCaptured(object sender, AudioStreamEventArgs e)
+#pragma warning restore RCS1163
     {
         if (_pcmBuffer == null)
             return;
