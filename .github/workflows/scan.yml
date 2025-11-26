@@ -18,6 +18,7 @@ jobs:
 
       - name: Fetch Roslynator analyzers
         run: |
+          mkdir -p analyzers/Roslynator.Analyzers
           curl -L https://www.nuget.org/api/v2/package/Roslynator.Analyzers -o Roslynator.Analyzers.zip
           unzip -q Roslynator.Analyzers.zip -d analyzers/Roslynator.Analyzers
 
