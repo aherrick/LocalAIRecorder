@@ -65,7 +65,7 @@
 		<PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.11" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-		<PackageReference Include="CommunityToolkit.Maui" Version="6.0.0" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="13.0.0" />
 		<PackageReference Include="Plugin.Maui.Audio" Version="4.0.0" />
 		<PackageReference Include="Whisper.net" Version="1.9.0" />
 		<PackageReference Include="Whisper.net.AllRuntimes" Version="1.9.0" Condition="'$(TargetFramework)'!='net10.0-ios'" />
