@@ -10,18 +10,8 @@ public class AudioService
     private string _targetPath;
     private DateTime _recordingStartTime;
 
-    public AudioService()
-    { }
-
-#pragma warning disable RCS1146 // Conditional access would require nullable
-    public bool IsRecording => _streamer != null && _streamer.IsStreaming;
-#pragma warning restore RCS1146
-
     public async Task StartRecordingAsync()
     {
-        if (IsRecording)
-            return;
-
         _streamer = AudioManager.Current.CreateStreamer();
         _streamer.Options.Channels = ChannelType.Mono;
         _streamer.Options.BitDepth = BitDepth.Pcm16bit;
@@ -64,9 +54,7 @@ public class AudioService
         return (result, duration);
     }
 
-#pragma warning disable RCS1163 // Event handler signature requires sender
-    private void OnAudioCaptured(object sender, AudioStreamEventArgs e)
-#pragma warning restore RCS1163
+    private void OnAudioCaptured(object _, AudioStreamEventArgs e)
     {
         if (_pcmBuffer == null)
             return;
