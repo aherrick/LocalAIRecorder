@@ -13,6 +13,7 @@ public partial class DetailsPage : ContentPage
 
 public class BoolToColorConverter : IValueConverter
 {
+#pragma warning disable CA1822 // Interface requires instance method
     public object Convert(
         object value,
         Type _,
@@ -36,4 +37,5 @@ public class BoolToColorConverter : IValueConverter
     {
         throw new NotImplementedException();
     }
+#pragma warning restore CA1822
 }

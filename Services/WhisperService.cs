@@ -16,10 +16,10 @@ public class WhisperService
         {
             Directory.CreateDirectory(FileSystem.AppDataDirectory);
 
-            using var modelStream = await WhisperGgmlDownloader.Default.GetGgmlModelAsync(
+            await using var modelStream = await WhisperGgmlDownloader.Default.GetGgmlModelAsync(
                 GgmlType.Base
             );
-            using var fileWriter = File.OpenWrite(modelPath);
+            await using var fileWriter = File.OpenWrite(modelPath);
             await modelStream.CopyToAsync(fileWriter);
         }
     }
@@ -31,8 +31,8 @@ public class WhisperService
         if (!File.Exists(modelPath))
             await EnsureModelAsync();
 
-        await using var factory = WhisperFactory.FromPath(modelPath);
-        await using var processor = factory
+        using var factory = WhisperFactory.FromPath(modelPath);
+        using var processor = factory
             .CreateBuilder()
             .WithLanguage(language)
             .WithThreads(Environment.ProcessorCount)

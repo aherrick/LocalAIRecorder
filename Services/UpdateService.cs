@@ -21,13 +21,13 @@ public static class UpdateService
                 ?.ElementsAfterSelf("string")
                 .FirstOrDefault();
 
-            Version? remoteVersion = null;
+            var remoteText = "(none)";
             if (
                 versionElement != null
-                && Version.TryParse(versionElement.Value, out var parsedRemote)
+                && Version.TryParse(versionElement.Value, out var remoteVersion)
             )
             {
-                remoteVersion = parsedRemote;
+                remoteText = remoteVersion.ToString();
                 if (remoteVersion > AppInfo.Current.Version)
                 {
                     await Launcher.OpenAsync("https://localairecorder.z19.web.core.windows.net");
@@ -36,7 +36,6 @@ public static class UpdateService
 
             // Debug toast: show current vs remote (or unknown)
             var current = AppInfo.Current.VersionString;
-            var remoteText = remoteVersion?.ToString() ?? "(none)";
             var toastMessage = $"Version: current {current} / remote {remoteText}";
 
             await MainThread.InvokeOnMainThreadAsync(async () =>

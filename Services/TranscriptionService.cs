@@ -16,8 +16,8 @@ public static class TranscriptionService
             throw new FileNotFoundException("Audio file not found", audioFilePath);
         }
 
-        await using var whisperFactory = WhisperFactory.FromPath(modelPath);
-        await using var processor = whisperFactory.CreateBuilder().WithLanguage("auto").Build();
+        using var whisperFactory = WhisperFactory.FromPath(modelPath);
+        using var processor = whisperFactory.CreateBuilder().WithLanguage("auto").Build();
 
         await using var fileStream = File.OpenRead(audioFilePath);
 
