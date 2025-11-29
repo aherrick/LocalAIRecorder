@@ -32,6 +32,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<ILocalIntelligenceService, AppleLocalIntelligenceService>();
 #elif WINDOWS
         builder.Services.AddSingleton<ILocalIntelligenceService, WindowsLocalIntelligenceService>();
+#elif ANDROID
+        builder.Services.AddSingleton<ILocalIntelligenceService, AndroidLocalIntelligenceService>();
 #endif
 
         // ViewModels
